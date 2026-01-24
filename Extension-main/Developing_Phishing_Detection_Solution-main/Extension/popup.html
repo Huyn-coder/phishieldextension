@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PhishShield</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg-primary: #ffffff;
@@ -14,9 +17,9 @@
       --text-secondary: #6c757d;
       --text-muted: #adb5bd;
       --border-color: #dee2e6;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+
       --accent-safe: #198754;
       --accent-safe-bg: #d1e7dd;
       --accent-warning: #fd7e14;
@@ -25,7 +28,7 @@
       --accent-danger-bg: #f8d7da;
       --accent-blue: #0d6efd;
       --accent-blue-bg: #cfe2ff;
-      
+
       --link-item-bg: #ffffff;
     }
 
@@ -37,8 +40,8 @@
       --text-secondary: #aeb5bc;
       --text-muted: #5c5f66;
       --border-color: #2c2e33;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
 
       --accent-safe: #2ea043;
       --accent-safe-bg: rgba(46, 160, 67, 0.15);
@@ -48,7 +51,7 @@
       --accent-danger-bg: rgba(248, 81, 73, 0.15);
       --accent-blue: #58a6ff;
       --accent-blue-bg: rgba(88, 166, 255, 0.15);
-      
+
       --link-item-bg: #25262b;
     }
 
@@ -84,7 +87,9 @@
       width: 100%;
     }
 
-    .logo { font-size: 24px; }
+    .logo {
+      font-size: 24px;
+    }
 
     .header-text {
       display: flex;
@@ -119,11 +124,18 @@
       transition: background 0.2s;
       margin-right: 8px;
     }
+
     .theme-toggle:hover {
       background: var(--bg-secondary);
     }
-    .theme-icon { filter: grayscale(100%); }
-    body.dark-mode .theme-icon { filter: none; }
+
+    .theme-icon {
+      filter: grayscale(100%);
+    }
+
+    body.dark-mode .theme-icon {
+      filter: none;
+    }
 
     .status-indicator {
       display: flex;
@@ -145,7 +157,9 @@
       border-radius: 50%;
     }
 
-    .content { padding: 20px; }
+    .content {
+      padding: 20px;
+    }
 
     .url-section {
       background: var(--bg-primary);
@@ -186,9 +200,17 @@
       transition: transform 0.2s ease;
     }
 
-    .risk-card.safe { border-top: 5px solid var(--accent-safe); }
-    .risk-card.suspicious { border-top: 5px solid var(--accent-warning); }
-    .risk-card.malicious { border-top: 5px solid var(--accent-danger); }
+    .risk-card.safe {
+      border-top: 5px solid var(--accent-safe);
+    }
+
+    .risk-card.suspicious {
+      border-top: 5px solid var(--accent-warning);
+    }
+
+    .risk-card.malicious {
+      border-top: 5px solid var(--accent-danger);
+    }
 
     .risk-icon {
       font-size: 40px;
@@ -203,9 +225,17 @@
       color: var(--text-primary);
     }
 
-    .risk-card.safe .risk-title { color: var(--accent-safe); }
-    .risk-card.suspicious .risk-title { color: var(--accent-warning); }
-    .risk-card.malicious .risk-title { color: var(--accent-danger); }
+    .risk-card.safe .risk-title {
+      color: var(--accent-safe);
+    }
+
+    .risk-card.suspicious .risk-title {
+      color: var(--accent-warning);
+    }
+
+    .risk-card.malicious .risk-title {
+      color: var(--accent-danger);
+    }
 
     .risk-description {
       font-size: 14px;
@@ -270,30 +300,40 @@
       color: white;
       grid-column: span 2;
     }
-    .btn-primary:hover { opacity: 0.9; }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
 
     .btn-safe {
       background: var(--bg-primary);
       border: 1px solid var(--accent-safe);
       color: var(--accent-safe);
     }
-    .btn-safe:hover { background: var(--accent-safe-bg); }
+
+    .btn-safe:hover {
+      background: var(--accent-safe-bg);
+    }
 
     .btn-danger {
       background: var(--bg-primary);
       border: 1px solid var(--accent-danger);
       color: var(--accent-danger);
     }
-    .btn-danger:hover { background: var(--accent-danger-bg); }
+
+    .btn-danger:hover {
+      background: var(--accent-danger-bg);
+    }
 
     .btn-warning {
       grid-column: span 2;
       background: var(--accent-warning-bg);
       color: #b75505;
     }
+
     body.dark-mode .btn-warning {
-        color: #ffdca1;
-        background: rgba(210, 153, 34, 0.25);
+      color: #ffdca1;
+      background: rgba(210, 153, 34, 0.25);
     }
 
     .links-section {
@@ -323,9 +363,18 @@
       font-weight: 700;
       display: block;
     }
-    .stat-value.safe { color: var(--accent-safe); }
-    .stat-value.suspicious { color: var(--accent-warning); }
-    .stat-value.malicious { color: var(--accent-danger); }
+
+    .stat-value.safe {
+      color: var(--accent-safe);
+    }
+
+    .stat-value.suspicious {
+      color: var(--accent-warning);
+    }
+
+    .stat-value.malicious {
+      color: var(--accent-danger);
+    }
 
     .stat-label {
       font-size: 10px;
@@ -343,7 +392,10 @@
       font-size: 12px;
       cursor: pointer;
     }
-    .scan-btn:hover { background: var(--bg-secondary); }
+
+    .scan-btn:hover {
+      background: var(--bg-secondary);
+    }
 
     .spinner {
       width: 30px;
@@ -354,9 +406,17 @@
       animation: spin 1s linear infinite;
       margin: 0 auto 10px;
     }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    .loading-text { color: var(--text-secondary); font-size: 13px; }
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
 
 
     .bad-links-area {
@@ -367,8 +427,8 @@
 
     .bad-links-container {
       max-height: 300px;
-      overflow-y: auto;  
-      
+      overflow-y: auto;
+
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: 6px;
@@ -380,11 +440,13 @@
     .bad-links-container::-webkit-scrollbar {
       width: 10px;
     }
+
     .bad-links-container::-webkit-scrollbar-thumb {
       background: var(--text-secondary);
       border-radius: 5px;
       border: 2px solid var(--bg-secondary);
     }
+
     .bad-links-container::-webkit-scrollbar-track {
       background: transparent;
     }
@@ -398,23 +460,36 @@
       background: var(--link-item-bg);
       border-radius: 4px;
       border-left: 3px solid transparent;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
-    .link-item:last-child { margin-bottom: 0; }
+
+    .link-item:last-child {
+      margin-bottom: 0;
+    }
 
     .link-url {
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis; 
+      text-overflow: ellipsis;
       max-width: 200px;
       color: var(--text-primary);
     }
 
-    .link-item.suspicious { border-left-color: var(--accent-warning); }
-    .link-item.malicious { border-left-color: var(--accent-danger); }
+    .link-item.suspicious {
+      border-left-color: var(--accent-warning);
+    }
 
-    body.dark-mode .link-item.malicious { background: rgba(239, 68, 68, 0.1); }
-    body:not(.dark-mode) .link-item.malicious { background: #fff5f5; }
+    .link-item.malicious {
+      border-left-color: var(--accent-danger);
+    }
+
+    body.dark-mode .link-item.malicious {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    body:not(.dark-mode) .link-item.malicious {
+      background: #fff5f5;
+    }
 
     .link-badge {
       font-size: 9px;
@@ -423,8 +498,16 @@
       border-radius: 4px;
       text-transform: uppercase;
     }
-    .link-item.suspicious .link-badge { color: var(--accent-warning); background: var(--accent-warning-bg); }
-    .link-item.malicious .link-badge { color: var(--accent-danger); background: var(--accent-danger-bg); }
+
+    .link-item.suspicious .link-badge {
+      color: var(--accent-warning);
+      background: var(--accent-warning-bg);
+    }
+
+    .link-item.malicious .link-badge {
+      color: var(--accent-danger);
+      background: var(--accent-danger-bg);
+    }
 
     .toast {
       position: fixed;
@@ -445,9 +528,21 @@
       box-shadow: var(--shadow-md);
       color: var(--text-primary);
     }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .toast.success { border-color: rgba(16, 185, 129, 0.4); color: var(--accent-safe); }
-    .toast.error { border-color: rgba(239, 68, 68, 0.4); color: var(--accent-danger); }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-color: rgba(16, 185, 129, 0.4);
+      color: var(--accent-safe);
+    }
+
+    .toast.error {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: var(--accent-danger);
+    }
 
     .error-state {
       text-align: center;
@@ -456,12 +551,25 @@
       border-radius: 16px;
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
-    .error-icon { font-size: 48px; margin-bottom: 12px; }
-    .error-title { color: var(--accent-danger); font-weight: 600; margin-bottom: 8px; }
-    .error-desc { color: var(--text-muted); font-size: 12px; }
 
+    .error-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .error-title {
+      color: var(--accent-danger);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .error-desc {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
   </style>
 </head>
+
 <body>
   <div class="header">
     <div class="header-content">
@@ -470,7 +578,7 @@
         <h1>PhishShield</h1>
         <p>Phishing Detection</p>
       </div>
-      
+
       <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">
         <span class="theme-icon">🌞</span>
       </button>
@@ -490,11 +598,13 @@
       <div class="current-url" id="currentUrl">Loading...</div>
     </div>
 
+
+    <div id="loadingState" class="loading-state" style="display: none;">
+      <div class="spinner"></div>
+      <div class="loading-text">Analyzing URL...</div>
+    </div>
     <div id="riskCardContainer">
-      <div class="loading-state" id="loadingState">
-        <div class="spinner"></div>
-        <div class="loading-text">Analyzing URL...</div>
-      </div>
+
     </div>
 
     <div class="actions" id="actionButtons" style="display: none;">
@@ -535,7 +645,7 @@
       <div id="badLinksArea" class="bad-links-area" style="display: none;">
         <div class="section-label" style="margin-bottom: 8px;">⚠️ Suspicious URL Identification:</div>
         <div class="bad-links-container" id="badLinksList">
-            </div>
+        </div>
       </div>
       <button class="scan-btn" id="scanLinksBtn">
         <span>🔍</span> Scan All Links on Page
@@ -548,4 +658,5 @@
   <script src="config.js"></script>
   <script src="popup.js"></script>
 </body>
+
 </html>
