@@ -219,9 +219,11 @@ class PhishShieldPopup {
     `;
   }
 
-  getScoreColor(score) {
-    if (score >= 0.8) return '#ef4444';
-    if (score >= 0.5) return '#f59e0b';
+getScoreColor(score) {
+    const thresholds = this.config.THRESHOLDS || { MALICIOUS: 0.8, SUSPICIOUS: 0.5 };
+
+    if (score >= thresholds.MALICIOUS) return '#ef4444';
+    if (score >= thresholds.SUSPICIOUS) return '#f59e0b';
     return '#10b981';
   }
 

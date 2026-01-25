@@ -8,8 +8,8 @@ const PHISHSHIELD_CONFIG = {
     HEALTH: "/"
   },
   THRESHOLDS: {
-    MALICIOUS: 0.6,
-    SUSPICIOUS: 0.4
+    MALICIOUS: 0.8,
+    SUSPICIOUS: 0.5
   },
   TRUSTED_PLATFORMS: [
     'facebook.com', 'm.facebook.com', 'instagram.com', 'twitter.com', 'x.com',
