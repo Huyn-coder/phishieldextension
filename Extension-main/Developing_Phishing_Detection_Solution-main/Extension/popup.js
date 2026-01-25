@@ -7,13 +7,15 @@ class PhishShieldPopup {
   }
 
   async init() {
+    this.setupEventListeners();
+
     await this.initTheme();
     await this.getCurrentTab();
-    
+
     const isOnline = await this.checkApiConnection();
 
-    if (this.currentUrl && this.currentUrl.startsWith('http')) {
-      try {
+    try {
+      if (this.currentUrl && this.currentUrl.startsWith('http')) {
         const cachedResult = await chrome.runtime.sendMessage({
           action: 'getScanResult',
           url: this.currentUrl
@@ -21,19 +23,22 @@ class PhishShieldPopup {
 
         if (cachedResult) {
           document.getElementById('riskCardContainer').innerHTML = this.renderRiskCard(cachedResult);
-          document.getElementById('actionButtons').style.display = 'grid';
-          document.getElementById('loadingState').style.display = 'none';
+          const actionBtns = document.getElementById('actionButtons');
+          const loading = document.getElementById('loadingState');
+          if (actionBtns) actionBtns.style.display = 'grid';
+          if (loading) loading.style.display = 'none';
         } else {
           await this.scanCurrentUrl();
         }
-      } catch (e) {
+      } else {
         await this.scanCurrentUrl();
       }
-    } else {
-      await this.scanCurrentUrl(); 
+    } catch (error) {
+      console.error("Lỗi trong quá trình khởi tạo scan:", error);
+      const actionBtns = document.getElementById('actionButtons');
+      if (actionBtns) actionBtns.style.display = 'grid';
     }
-    
-    this.setupEventListeners();
+
     this.loadPageLinksStats();
   }
 
@@ -54,10 +59,10 @@ class PhishShieldPopup {
 
     toggleBtn.addEventListener('click', async () => {
       document.body.classList.toggle('dark-mode');
-      
+
       const isDark = document.body.classList.contains('dark-mode');
       const newTheme = isDark ? 'dark' : 'light';
-      
+
       iconSpan.textContent = isDark ? '🌙' : '🌞';
 
       await chrome.storage.local.set({ theme: newTheme });
@@ -89,7 +94,7 @@ class PhishShieldPopup {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
-      
+
       if (response.ok) {
         statusEl.innerHTML = '<div class="status-dot"></div><span>Connected</span>';
         statusEl.style.background = 'var(--accent-safe-bg)';
@@ -98,7 +103,7 @@ class PhishShieldPopup {
       }
     } catch (error) {
     }
-    
+
     statusEl.innerHTML = '<span>⚠️</span><span>Offline</span>';
     statusEl.style.background = 'var(--accent-danger-bg)';
     statusEl.style.color = 'var(--accent-danger)';
@@ -109,15 +114,17 @@ class PhishShieldPopup {
     const container = document.getElementById('riskCardContainer');
     const loadingState = document.getElementById('loadingState');
     const actionButtons = document.getElementById('actionButtons');
-    
+
+    if (loadingState) loadingState.style.display = 'flex';
+    if (actionButtons) actionButtons.style.display = 'none';
+    if (container) container.innerHTML = '';
+    await new Promise(r => setTimeout(r, 600));
+
     if (!this.currentUrl || !this.currentUrl.startsWith('http')) {
-      container.innerHTML = this.renderInfoCard('Internal Page', 'This is a browser internal page and cannot be scanned.');
-      actionButtons.style.display = 'none';
+      if (loadingState) loadingState.style.display = 'none';
+      container.innerHTML = this.renderInfoCard('Internal Page', 'Cannot scan this page.');
       return;
     }
-
-    loadingState.style.display = 'block';
-    actionButtons.style.display = 'none';
 
     try {
       const response = await fetch(`${this.config.API_URL}${this.config.ENDPOINTS.CHECK_URL}`, {
@@ -127,14 +134,9 @@ class PhishShieldPopup {
       });
 
       const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error);
-      }
 
       container.innerHTML = this.renderRiskCard(data);
-      actionButtons.style.display = 'grid';
-      
+
       chrome.runtime.sendMessage({
         action: 'updateBadge',
         risk: data.risk,
@@ -142,18 +144,21 @@ class PhishShieldPopup {
       });
 
     } catch (error) {
-      container.innerHTML = this.renderErrorCard('Connection Error', 'Unable to connect to PhishShield server. Please make sure the backend is running.');
-      actionButtons.style.display = 'none';
+      console.error(error);
+      container.innerHTML = this.renderErrorCard('Connection Error', 'Could not connect to server.');
+    } finally {
+      if (loadingState) loadingState.style.display = 'none';
+      if (actionButtons) actionButtons.style.display = 'grid';
     }
   }
 
   renderRiskCard(data) {
     let isTrustedPlatform = false;
     try {
-        const hostname = new URL(this.currentUrl).hostname;
-        const trustedDomains = this.config.TRUSTED_PLATFORMS || []; 
-        isTrustedPlatform = trustedDomains.some(d => hostname.endsWith(d));
-    } catch(e) {}
+      const hostname = new URL(this.currentUrl).hostname;
+      const trustedDomains = this.config.TRUSTED_PLATFORMS || [];
+      isTrustedPlatform = trustedDomains.some(d => hostname.endsWith(d));
+    } catch (e) { }
 
     const icons = {
       safe: '✅',
@@ -174,8 +179,8 @@ class PhishShieldPopup {
     };
 
     if (isTrustedPlatform && data.risk === 'suspicious') {
-        titles.suspicious = 'Caution: User Content';
-        descriptions.suspicious = 'This domain is trusted, but it may contain suspicious links or content posted by users. Be careful what you click.';
+      titles.suspicious = 'Caution: User Content';
+      descriptions.suspicious = 'This domain is trusted, but it may contain suspicious links or content posted by users. Be careful what you click.';
     }
 
     const score = (data.score * 100).toFixed(1);
@@ -229,22 +234,22 @@ getScoreColor(score) {
 
   formatReason(reason) {
     const reasonMap = {
-        'whitelist': '✅ Whitelisted',
-        'blacklist': '🚫 Blacklisted',
-        'model_probability': '🤖 AI Analysis', 
-        'ML Analysis': '🤖 AI Analysis', 
-        'has_https': '🔒 Secured with HTTPS',
-        'no_https': '⚠️ Missing HTTPS',
-        'personal_domain_pattern': '⚠️ Suspicious Domain Pattern',
-        'ip_address_url': '⚠️ IP Address URL',
-        'no_suspicious_keywords': '✅ No Suspicious Keywords',
-        'sus_keyword': '🚫 Suspicious Keywords Found',
-        'long_url': '📏 URL Too Long',
-        'short_url': '🔗 Shortened URL',
-        'trusted_pattern': '🛡️ Trusted Pattern',
-        'score_adjusted_for_https': '🔒 HTTPS Bonus',
-        'score_adjusted_for_known_tld': '🌐 Known TLD',
-        'score_adjusted_for_short_url': '🔗 Short URL Penalty'
+      'whitelist': '✅ Whitelisted',
+      'blacklist': '🚫 Blacklisted',
+      'model_probability': '🤖 AI Analysis',
+      'ML Analysis': '🤖 AI Analysis',
+      'has_https': '🔒 Secured with HTTPS',
+      'no_https': '⚠️ Missing HTTPS',
+      'personal_domain_pattern': '⚠️ Suspicious Domain Pattern',
+      'ip_address_url': '⚠️ IP Address URL',
+      'no_suspicious_keywords': '✅ No Suspicious Keywords',
+      'sus_keyword': '🚫 Suspicious Keywords Found',
+      'long_url': '📏 URL Too Long',
+      'short_url': '🔗 Shortened URL',
+      'trusted_pattern': '🛡️ Trusted Pattern',
+      'score_adjusted_for_https': '🔒 HTTPS Bonus',
+      'score_adjusted_for_known_tld': '🌐 Known TLD',
+      'score_adjusted_for_short_url': '🔗 Short URL Penalty'
     };
 
     return reasonMap[reason] || reason.replace(/_/g, ' ');
@@ -278,8 +283,8 @@ getScoreColor(score) {
       return;
     }
 
-    const endpoint = listType === 'whitelist' 
-      ? this.config.ENDPOINTS.WHITELIST 
+    const endpoint = listType === 'whitelist'
+      ? this.config.ENDPOINTS.WHITELIST
       : this.config.ENDPOINTS.BLACKLIST;
 
     try {
@@ -360,8 +365,25 @@ getScoreColor(score) {
     btn.innerHTML = '<span>⏳</span> Scanning...';
 
     try {
-      const response = await chrome.tabs.sendMessage(this.currentTabId, { action: 'getLinks' });
-      
+      let response;
+      try {
+        response = await chrome.tabs.sendMessage(this.currentTabId, { action: 'getLinks' });
+      } catch (err) {
+        if (err.message.includes("Could not establish connection") ||
+          err.message.includes("Receiving end does not exist")) {
+
+          console.log("⚠️ Content script chưa load, đang inject thủ công...");
+
+          await chrome.scripting.executeScript({
+            target: { tabId: this.currentTabId },
+            files: ['content.js']
+          });
+
+          response = await chrome.tabs.sendMessage(this.currentTabId, { action: 'getLinks' });
+        } else {
+          throw err;
+        }
+      }
       if (!response || !response.links) {
         throw new Error('No links found');
       }
@@ -372,7 +394,7 @@ getScoreColor(score) {
       const stats = { total: links.length, safe: 0, suspicious: 0, malicious: 0 };
       const results = [];
 
-      for (const link of links.slice(0, 50)) { 
+      for (const link of links.slice(0, 50)) {
         try {
           const checkResponse = await fetch(`${this.config.API_URL}${this.config.ENDPOINTS.CHECK_URL}`, {
             method: 'POST',
@@ -382,7 +404,7 @@ getScoreColor(score) {
 
           const data = await checkResponse.json();
           results.push({ url: link, ...data });
-          
+
           if (data.risk === 'safe') stats.safe++;
           else if (data.risk === 'suspicious') stats.suspicious++;
           else if (data.risk === 'malicious') stats.malicious++;
@@ -394,7 +416,7 @@ getScoreColor(score) {
 
             const div = document.createElement('div');
             div.className = `link-item ${data.risk}`;
-            
+
             div.innerHTML = `
                 <div class="link-url" title="${link}">${link}</div>
                 <div class="link-badge">${data.risk === 'malicious' ? 'DANGER' : 'SUSPECT'}</div>
@@ -412,15 +434,21 @@ getScoreColor(score) {
       pageLinksStats[this.currentUrl] = stats;
       await chrome.storage.local.set({ pageLinksStats });
 
-      chrome.tabs.sendMessage(this.currentTabId, {
-        action: 'highlightLinks',
-        results: results
-      });
+      try {
+        chrome.tabs.sendMessage(this.currentTabId, {
+          action: 'highlightLinks',
+          results: results
+        });
+      } catch (e) { console.log("Không thể highlight links (có thể tab đã đóng)"); }
 
       this.showToast(`Scanned ${links.length} links!`, 'success');
     } catch (error) {
       console.error('Error scanning page links:', error);
-      this.showToast('Failed to scan page links', 'error');
+      if (error.message.includes("No links found")) {
+        this.showToast('Không tìm thấy link nào trên trang này', 'error');
+      } else {
+        this.showToast('Lỗi: Vui lòng Reload lại trang web và thử lại', 'error');
+      }
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<span>🔍</span> Scan All Links on Page';
