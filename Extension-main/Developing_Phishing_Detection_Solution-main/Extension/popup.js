@@ -236,8 +236,8 @@ getScoreColor(score) {
     const reasonMap = {
       'whitelist': '✅ Whitelisted',
       'blacklist': '🚫 Blacklisted',
-      'model_probability': '🤖 AI Analysis',
-      'ML Analysis': '🤖 AI Analysis',
+      'model_probability': 'Model Probability',
+      'ML Analysis': 'ML Analysis',
       'has_https': '🔒 Secured with HTTPS',
       'no_https': '⚠️ Missing HTTPS',
       'personal_domain_pattern': '⚠️ Suspicious Domain Pattern',
